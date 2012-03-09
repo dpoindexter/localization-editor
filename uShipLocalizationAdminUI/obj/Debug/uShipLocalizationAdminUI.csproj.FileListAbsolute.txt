@@ -1,0 +1,7 @@
+C:\Web\uShipLocalizationAdminUI\uShipLocalizationAdminUI\bin\uShipLocalizationAdminUI.dll
+C:\Web\uShipLocalizationAdminUI\uShipLocalizationAdminUI\bin\uShipLocalizationAdminUI.pdb
+C:\Web\uShipLocalizationAdminUI\uShipLocalizationAdminUI\bin\Nancy.dll
+C:\Web\uShipLocalizationAdminUI\uShipLocalizationAdminUI\bin\Nancy.Hosting.Aspnet.dll
+C:\Web\uShipLocalizationAdminUI\uShipLocalizationAdminUI\obj\Debug\ResolveAssemblyReference.cache
+C:\Web\uShipLocalizationAdminUI\uShipLocalizationAdminUI\obj\Debug\uShipLocalizationAdminUI.dll
+C:\Web\uShipLocalizationAdminUI\uShipLocalizationAdminUI\obj\Debug\uShipLocalizationAdminUI.pdb
