@@ -6,9 +6,9 @@ using Nancy;
 
 namespace uShipLocalizationAdminUI.Modules
 {
-    public class LocalizationBundleModule : NancyModule
+    public class BundleModule : NancyModule
     {
-        public LocalizationBundleModule() : base("/bundles")
+        public BundleModule() : base("/bundles")
         {
             Get["/"] = parameters =>
             {
