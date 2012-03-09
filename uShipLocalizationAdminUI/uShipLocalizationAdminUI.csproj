@@ -66,8 +66,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\Contracts\IBundle.cs" />
+    <Compile Include="BundleService\Contracts\ILocalizationBundleRepository.cs" />
+    <Compile Include="Models\Contracts\IRepository.cs" />
     <Compile Include="Modules\LocalizationBundleModule.cs" />
-    <Compile Include="Modules\LocalizationModule.cs" />
+    <Compile Include="Modules\DefaultModule.cs" />
     <Compile Include="Modules\LocalizationResourceModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -78,6 +81,7 @@
     <Folder Include="content\css\" />
     <Folder Include="content\img\" />
     <Folder Include="content\js\" />
+    <Folder Include="ResourceService\Contracts\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
