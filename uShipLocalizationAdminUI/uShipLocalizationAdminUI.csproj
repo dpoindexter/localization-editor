@@ -89,6 +89,7 @@
     <Content Include="content\css\main.css" />
     <Content Include="content\js\backbone-min.js" />
     <Content Include="content\js\backbone.js" />
+    <Content Include="content\js\main.js" />
     <Content Include="content\js\underscore-min.js" />
     <Content Include="content\js\underscore.js" />
     <Content Include="Web.config">
@@ -105,7 +106,6 @@
     <Compile Include="Data\Contracts\IIndexed.cs" />
     <Compile Include="Data\Contracts\IRepository.cs" />
     <Compile Include="Models\ResourceJsonViewModel.cs" />
-    <Compile Include="Modules\CustomBootstrapper.cs" />
     <Compile Include="Services\LocalizationBundleService.cs" />
     <Compile Include="Data\Contracts\ILocalizationContext.cs" />
     <Compile Include="Data\LocalizationContext.cs" />

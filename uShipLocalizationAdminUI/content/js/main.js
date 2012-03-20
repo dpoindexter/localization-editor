@@ -1,7 +1,7 @@
 ﻿var Editor = {};
 
 var ViewData = {
-    tableEl: $
+    tableEl: $("#list-resources"),
     columns: [
         { id: 0, ColumnName: "Id", Enabled: true, Invisible: true },
         { id: 1, ColumnName: "ResourceKey", Enabled: true, Invisible: false },
@@ -71,7 +71,7 @@ Editor.HeaderRow = Backbone.View.extend({
         var self = this;
         this.collection.each(function (col) {
             if (col.get("Enabled"))
-                $.tmpl(self.template, col.toJSON()).appendTo(self.el);
+                $(self.template(col.toJSON())).appendTo(self.el);
         });
         return this;
     }
@@ -113,7 +113,7 @@ Editor.ColumnPicker = Backbone.View.extend({
         var self = this;
         this.collection.each(function (col, i) {
             if (!col.get("Invisible"))
-                $.tmpl(self.template, col.toJSON()).appendTo(self.el);
+                $(self.template(col.toJSON())).appendTo(self.el);
         });
         return this;
     }
@@ -124,17 +124,7 @@ Editor.Resource = Backbone.Model.extend({});
 
 Editor.ResourceCollection = Backbone.Collection.extend({
     model: Editor.Resource,
-    url: "/resources",
-
-    getDateRange: function () {
-        var start = dateStart.datepicker("getDate");
-        var end = dateEnd.datepicker("getDate");
-        var dates = $.param({
-            start: new Date(start).valueOf(),
-            end: new Date(end).valueOf()
-        });
-        this.fetch({ data: dates });
-    }
+    url: "/resources"
 });
 
 Editor.ResourceRow = Backbone.View.extend({
@@ -146,7 +136,7 @@ Editor.ResourceRow = Backbone.View.extend({
     },
 
     render: function (cols) {
-        $.tmpl(this.template, this.model.toJSON(), { keys: cols }).appendTo(this.el);
+        $(this.template(this.model.toJSON())).appendTo(this.el);
         $(this.el).addClass(this.model.get("Status").toLowerCase());
         return this;
     }
@@ -233,3 +223,5 @@ Editor.EditorView = Backbone.View.extend({
         });
     }
 });
+
+var editor = new Editor.EditorView();
