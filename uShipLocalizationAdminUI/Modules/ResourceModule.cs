@@ -4,6 +4,9 @@ using System.Linq;
 using System.Web;
 using Nancy;
 using uShipLocalizationAdminUI.Models;
+using uShipLocalizationAdminUI.Services;
+using uShipLocalizationAdminUI.Models.Contracts;
+
 
 namespace uShipLocalizationAdminUI.Modules
 {
@@ -13,21 +16,18 @@ namespace uShipLocalizationAdminUI.Modules
         {
             Get["/"] = parameters => 
             {
-                return Response.AsJson(new LocalizationResource
-                {
-                    Id = 1,
-                    ResourceName = "HelloWorld",
-                    en = "Hello",
-                    es = "Hola",
-                    de = "Gutentag",
-                    fr = "Oui",
-                    Bundles = new List<LocalizationBundle>()
-                });
+                var resourceService = new LocalizationResourceService();
+                var resources = resourceService.GetItems().Take(10).ToList();
+                var json = resources.Select(r => new ResourceJsonViewModel(r));
+
+                return Response.AsJson(json);
             };
 
-            Get["/{id}"] = parameters => 
-            { 
-                return "Resource " + parameters.id; 
+            Get["/{key}"] = parameters => 
+            {
+                var resourceService = new LocalizationResourceService();
+                var resource = resourceService.GetItemByKey(parameters.key);
+                return "Foo";
             };
         }
     }

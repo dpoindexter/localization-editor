@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="LocalizationEntityModels" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityContainer Name="LocalizationEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Localization_Bundle" EntityType="LocalizationEntityModels.Localization_Bundle" />
+    <EntitySet Name="Localization_Resource" EntityType="LocalizationEntityModels.Localization_Resource" />
+    <EntitySet Name="Localization_ResourceBundle" EntityType="LocalizationEntityModels.Localization_ResourceBundle" />
+    <AssociationSet Name="FK_Localization_ResourceBundle_Localization_Bundle" Association="LocalizationEntityModels.FK_Localization_ResourceBundle_Localization_Bundle">
+      <End Role="Localization_Bundle" EntitySet="Localization_Bundle" />
+      <End Role="Localization_ResourceBundle" EntitySet="Localization_ResourceBundle" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Localization_ResourceBundle_Localization_Resource" Association="LocalizationEntityModels.FK_Localization_ResourceBundle_Localization_Resource">
+      <End Role="Localization_Resource" EntitySet="Localization_Resource" />
+      <End Role="Localization_ResourceBundle" EntitySet="Localization_ResourceBundle" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Localization_Bundle">
+    <Key>
+      <PropertyRef Name="BundleID" />
+    </Key>
+    <Property Name="BundleID" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+    <Property Name="Name" Type="String" MaxLength="255" Unicode="true" FixedLength="false" />
+    <Property Name="BundleTypeID" Type="Double" />
+    <Property Name="Enabled" Type="Double" />
+    <NavigationProperty Name="Localization_ResourceBundle" Relationship="LocalizationEntityModels.FK_Localization_ResourceBundle_Localization_Bundle" FromRole="Localization_Bundle" ToRole="Localization_ResourceBundle" />
+  </EntityType>
+  <EntityType Name="Localization_Resource">
+    <Key>
+      <PropertyRef Name="ResourceID" />
+    </Key>
+    <Property Name="ResourceID" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+    <Property Name="ResourceKey" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+    <Property Name="en_US" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+    <Property Name="en_GB" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+    <Property Name="de_DE" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+    <Property Name="fr_FR" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+    <Property Name="nl_NL" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+    <Property Name="es_ES" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+    <NavigationProperty Name="Localization_ResourceBundle" Relationship="LocalizationEntityModels.FK_Localization_ResourceBundle_Localization_Resource" FromRole="Localization_Resource" ToRole="Localization_ResourceBundle" />
+  </EntityType>
+  <EntityType Name="Localization_ResourceBundle">
+    <Key>
+      <PropertyRef Name="ResourceBundleID" />
+    </Key>
+    <Property Name="ResourceID" Type="String" MaxLength="255" Unicode="true" FixedLength="false" />
+    <Property Name="BundleID" Type="String" MaxLength="255" Unicode="true" FixedLength="false" />
+    <Property Name="Enabled" Type="Boolean" />
+    <Property Name="ResourceBundleID" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+    <NavigationProperty Name="Localization_Bundle" Relationship="LocalizationEntityModels.FK_Localization_ResourceBundle_Localization_Bundle" FromRole="Localization_ResourceBundle" ToRole="Localization_Bundle" />
+    <NavigationProperty Name="Localization_Resource" Relationship="LocalizationEntityModels.FK_Localization_ResourceBundle_Localization_Resource" FromRole="Localization_ResourceBundle" ToRole="Localization_Resource" />
+  </EntityType>
+  <Association Name="FK_Localization_ResourceBundle_Localization_Bundle">
+    <End Role="Localization_Bundle" Type="LocalizationEntityModels.Localization_Bundle" Multiplicity="0..1" />
+    <End Role="Localization_ResourceBundle" Type="LocalizationEntityModels.Localization_ResourceBundle" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Localization_Bundle">
+        <PropertyRef Name="BundleID" />
+      </Principal>
+      <Dependent Role="Localization_ResourceBundle">
+        <PropertyRef Name="BundleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Localization_ResourceBundle_Localization_Resource">
+    <End Role="Localization_Resource" Type="LocalizationEntityModels.Localization_Resource" Multiplicity="0..1" />
+    <End Role="Localization_ResourceBundle" Type="LocalizationEntityModels.Localization_ResourceBundle" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Localization_Resource">
+        <PropertyRef Name="ResourceID" />
+      </Principal>
+      <Dependent Role="Localization_ResourceBundle">
+        <PropertyRef Name="ResourceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

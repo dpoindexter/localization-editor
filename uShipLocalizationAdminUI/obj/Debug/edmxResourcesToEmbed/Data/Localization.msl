@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="LocalizationEntityModelsStoreContainer" CdmEntityContainer="LocalizationEntities">
+    <EntitySetMapping Name="Localization_Bundle">
+      <EntityTypeMapping TypeName="LocalizationEntityModels.Localization_Bundle">
+        <MappingFragment StoreEntitySet="Localization_Bundle">
+          <ScalarProperty Name="BundleID" ColumnName="BundleID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="BundleTypeID" ColumnName="BundleTypeID" />
+          <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Localization_Resource">
+      <EntityTypeMapping TypeName="LocalizationEntityModels.Localization_Resource">
+        <MappingFragment StoreEntitySet="Localization_Resource">
+          <ScalarProperty Name="ResourceID" ColumnName="ResourceID" />
+          <ScalarProperty Name="ResourceKey" ColumnName="ResourceKey" />
+          <ScalarProperty Name="en_US" ColumnName="en-US" />
+          <ScalarProperty Name="en_GB" ColumnName="en-GB" />
+          <ScalarProperty Name="de_DE" ColumnName="de-DE" />
+          <ScalarProperty Name="fr_FR" ColumnName="fr-FR" />
+          <ScalarProperty Name="nl_NL" ColumnName="nl-NL" />
+          <ScalarProperty Name="es_ES" ColumnName="es-ES" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Localization_ResourceBundle">
+      <EntityTypeMapping TypeName="LocalizationEntityModels.Localization_ResourceBundle">
+        <MappingFragment StoreEntitySet="Localization_ResourceBundle">
+          <ScalarProperty Name="ResourceID" ColumnName="ResourceID" />
+          <ScalarProperty Name="BundleID" ColumnName="BundleID" />
+          <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+          <ScalarProperty Name="ResourceBundleID" ColumnName="ResourceBundleID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

@@ -10,7 +10,7 @@ namespace uShipLocalizationAdminUI
     {
         public DefaultModule()
         {
-            Get["/"] = parameters => View["index.html"];
+            Get["/"] = parameters => View["index.cshtml"];
         }
     }
 }

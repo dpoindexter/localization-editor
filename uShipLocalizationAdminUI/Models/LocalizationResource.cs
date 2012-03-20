@@ -3,19 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using uShipLocalizationAdminUI.Models.Contracts;
+using System.Data.Entity;
+using Nancy.Json;
 
 namespace uShipLocalizationAdminUI.Models
 {
     public class LocalizationResource : ILocalizationResource
     {
-        //[Key]
-        public int Id { get; set; }
-        public string ResourceName { get; set; }
-        public string en { get; set; }
-        public string fr { get; set; }
-        public string de { get; set; }
-        public string es { get; set; }
-        //[RelatedTo(RelatedProperty = "LocalizationBundle")] 
+        public LocalizationResource()
+        {
+            this.Bundles = new HashSet<LocalizationBundle>();
+        }
+
+        public string Id { get; set; }
+        public string ResourceKey { get; set; }
+        public string enUS { get; set; }
+        public string enGB { get; set; }
+        public string frFR { get; set; }
+        public string deDE { get; set; }
+        public string nlNL { get; set; }
+        public string esES { get; set; }
         public virtual ICollection<LocalizationBundle> Bundles { get; set; }
     }
 }

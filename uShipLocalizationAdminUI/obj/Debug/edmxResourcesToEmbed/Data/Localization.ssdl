@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="LocalizationEntityModels.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+  <EntityContainer Name="LocalizationEntityModelsStoreContainer">
+    <EntitySet Name="Localization_Bundle" EntityType="LocalizationEntityModels.Store.Localization_Bundle" store:Type="Tables" Schema="dbo" Table="Localization.Bundle" />
+    <EntitySet Name="Localization_Resource" EntityType="LocalizationEntityModels.Store.Localization_Resource" store:Type="Tables" Schema="dbo" Table="Localization.Resource" />
+    <EntitySet Name="Localization_ResourceBundle" EntityType="LocalizationEntityModels.Store.Localization_ResourceBundle" store:Type="Tables" Schema="dbo" Table="Localization.ResourceBundle" />
+    <AssociationSet Name="FK_Localization_ResourceBundle_Localization_Bundle" Association="LocalizationEntityModels.Store.FK_Localization_ResourceBundle_Localization_Bundle">
+      <End Role="Localization_Bundle" EntitySet="Localization_Bundle" />
+      <End Role="Localization_ResourceBundle" EntitySet="Localization_ResourceBundle" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Localization_ResourceBundle_Localization_Resource" Association="LocalizationEntityModels.Store.FK_Localization_ResourceBundle_Localization_Resource">
+      <End Role="Localization_Resource" EntitySet="Localization_Resource" />
+      <End Role="Localization_ResourceBundle" EntitySet="Localization_ResourceBundle" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Localization_Bundle">
+    <Key>
+      <PropertyRef Name="BundleID" />
+    </Key>
+    <Property Name="BundleID" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="Name" Type="nvarchar" MaxLength="255" />
+    <Property Name="BundleTypeID" Type="float" />
+    <Property Name="Enabled" Type="float" />
+  </EntityType>
+  <EntityType Name="Localization_Resource">
+    <Key>
+      <PropertyRef Name="ResourceID" />
+    </Key>
+    <Property Name="ResourceID" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="ResourceKey" Type="nvarchar" Nullable="false" MaxLength="255" />
+    <Property Name="en-US" Type="nvarchar(max)" />
+    <Property Name="en-GB" Type="nvarchar(max)" />
+    <Property Name="de-DE" Type="nvarchar(max)" />
+    <Property Name="fr-FR" Type="nvarchar(max)" />
+    <Property Name="nl-NL" Type="nvarchar(max)" />
+    <Property Name="es-ES" Type="nvarchar(max)" />
+  </EntityType>
+  <EntityType Name="Localization_ResourceBundle">
+    <Key>
+      <PropertyRef Name="ResourceBundleID" />
+    </Key>
+    <Property Name="ResourceID" Type="nvarchar" MaxLength="255" />
+    <Property Name="BundleID" Type="nvarchar" MaxLength="255" />
+    <Property Name="Enabled" Type="bit" />
+    <Property Name="ResourceBundleID" Type="nvarchar" Nullable="false" MaxLength="255" />
+  </EntityType>
+  <Association Name="FK_Localization_ResourceBundle_Localization_Bundle">
+    <End Role="Localization_Bundle" Type="LocalizationEntityModels.Store.Localization_Bundle" Multiplicity="0..1" />
+    <End Role="Localization_ResourceBundle" Type="LocalizationEntityModels.Store.Localization_ResourceBundle" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Localization_Bundle">
+        <PropertyRef Name="BundleID" />
+      </Principal>
+      <Dependent Role="Localization_ResourceBundle">
+        <PropertyRef Name="BundleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Localization_ResourceBundle_Localization_Resource">
+    <End Role="Localization_Resource" Type="LocalizationEntityModels.Store.Localization_Resource" Multiplicity="0..1" />
+    <End Role="Localization_ResourceBundle" Type="LocalizationEntityModels.Store.Localization_ResourceBundle" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Localization_Resource">
+        <PropertyRef Name="ResourceID" />
+      </Principal>
+      <Dependent Role="Localization_ResourceBundle">
+        <PropertyRef Name="ResourceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
