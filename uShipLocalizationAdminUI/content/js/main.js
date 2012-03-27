@@ -2,48 +2,51 @@
 
 var ViewData = {
     tableEl: $("#list-resources"),
-    columns: [
-        { id: 0, ColumnName: "Id", Enabled: true, Invisible: true },
-        { id: 1, ColumnName: "ResourceKey", Enabled: true, Invisible: false },
-        { id: 2, ColumnName: "en_US", Enabled: true, Invisible: false },
-        { id: 3, ColumnName: "en_GB", Enabled: true, Invisible: false },
-        { id: 4, ColumnName: "fr_FR", Enabled: true, Invisible: false },
-        { id: 5, ColumnName: "de_DE", Enabled: true, Invisible: false },
-        { id: 6, ColumnName: "nl_NL", Enabled: true, Invisible: false },
-        { id: 7, ColumnName: "es_ES", Enabled: true, Invisible: false },
-        { id: 8, ColumnName: "Bundles", Enabled: true, Invisible: false }
-    ]
+    columns: bootstrap.columns,
+    resources: bootstrap.resources
 };
 
+
+
 var Util = {
+    sortingFunctions: [[    
+        //String Ascending
+        function (str) {
+            return (str || "").toLowerCase();
+        },
+        //Number Ascending
+        function (num) {
+            return num;
+        },
+        //Date Ascending
+        function (date) {
+            return new Date(date).valueOf();
+        }
+    ],[
+        //String Descending
+        function (str) {
+            //Empty strings should be sorted last
+            if (!str || str === "")
+                return String.fromCharCode(0xffff);
+
+            return String.fromCharCode.apply(String,
+                _.map(str.toLowerCase().split(""), function (c) {
+                    return 0xffff - c.charCodeAt();
+                })
+            );
+        },
+        //Number Descending
+        function (num) {
+            return -num;
+        },
+        //Date Descending
+        function (date) {
+            return -new Date(date).valueOf();
+        }
+    ]],
+
     jsonToDate: function (dateString) {
         return new Date(parseInt(dateString.substr(6)))
-    },
-    ascNumber: function (num) {
-        return num;
-    },
-    descNumber: function (num) {
-        return -num;
-    },
-    ascString: function (str) {
-        return (str || "").toLowerCase();
-    },
-    descString: function (str) {
-        //Empty strings should be sorted last
-        if (!str || str === "")
-            return String.fromCharCode(0xffff);
-
-        return String.fromCharCode.apply(String,
-            _.map(str.toLowerCase().split(""), function (c) {
-                return 0xffff - c.charCodeAt();
-            })
-        );
-    },
-    ascDate: function (date) {
-        return new Date(date).valueOf();
-    },
-    descDate: function (date) {
-        return -new Date(date).valueOf();
     }
 }
 
@@ -112,7 +115,7 @@ Editor.ColumnPicker = Backbone.View.extend({
     render: function () {
         var self = this;
         this.collection.each(function (col, i) {
-            if (!col.get("Invisible"))
+            if (col.get("Visible"))
                 $(self.template(col.toJSON())).appendTo(self.el);
         });
         return this;
@@ -136,8 +139,8 @@ Editor.ResourceRow = Backbone.View.extend({
     },
 
     render: function (cols) {
-        $(this.template(this.model.toJSON())).appendTo(this.el);
-        $(this.el).addClass(this.model.get("Status").toLowerCase());
+        $(this.template({ cols: cols, cells: this.model.toJSON() })).appendTo(this.el);
+        //$(this.el).addClass(this.model.get("Status").toLowerCase());
         return this;
     }
 });
@@ -152,7 +155,7 @@ Editor.EditorView = Backbone.View.extend({
     initialize: function () {
         _.bindAll(this, "render", "changeSort", "sort");
 
-        this.resources = new Editor.ResourceCollection();
+        this.resources = new Editor.ResourceCollection(ViewData.resources);
         this.columns = new Editor.ColumnGroup(ViewData.columns);
 
         this.resources.bind("change", this.render);
@@ -169,28 +172,28 @@ Editor.EditorView = Backbone.View.extend({
 
     changeSort: function (event) {
         var sortColumn = this.columns.get($(event.target).data("id"));
-        var sort = sortColumn.get("Sort");
+        var sort = sortColumn.get("SortDirection");
 
         if (!sort) {
             var previousSort = this.columns.find(function (col) {
-                return !_.isNull(col.get("Sort"));
+                return !_.isNull(col.get("SortDirection"));
             });
-            previousSort.set({ Sort: null }, { silent: true });
-            sortColumn.set({ Sort: "asc" });
-        } else if (sort === "asc") {
-            sortColumn.set({ Sort: "desc" });
-        } else if (sort === "desc") {
-            sortColumn.set({ Sort: "asc" });
+            previousSort.set({ SortDirection: null }, { silent: true });
+            sortColumn.set({ SortDirection: 0 });
+        } else if (sort === 0) {
+            sortColumn.set({ SortDirection: 1 });
+        } else if (sort === 1) {
+            sortColumn.set({ SortDirection: 0 });
         }
     },
 
     sort: function () {
         var sortColumn = this.columns.find(function (col) {
-            return !_.isNull(col.get("Sort"));
+            return !_.isNull(col.get("SortDirection"));
         });
 
         this.resources.comparator = function (req) {
-            return Util[sortColumn.get("Sort") + (sortColumn.get("SortType") || "String")](req.get(sortColumn.get("ColumnName")));
+            return Util.sortingFunctions[sortColumn.get("SortDirection")][sortColumn.get("SortType") || 0](req.get(sortColumn.get("ColumnName")));
         };
         this.resources.sort();
     },
@@ -199,7 +202,6 @@ Editor.EditorView = Backbone.View.extend({
         this.appendColumnPickers(this.columns);
         this.appendColumnHeaders(this.columns);
         this.appendResources(this.resources, this.columns.getEnabledColumnNames());
-        this.saveState();
     },
 
     appendColumnPickers: function (cols) {

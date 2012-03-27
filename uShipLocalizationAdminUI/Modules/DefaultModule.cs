@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Nancy;
+using uShipLocalizationAdminUI.Models;
+using uShipLocalizationAdminUI.Contracts.Models;
+using uShipLocalizationAdminUI.Services;
 
 namespace uShipLocalizationAdminUI
 {
@@ -10,7 +13,16 @@ namespace uShipLocalizationAdminUI
     {
         public DefaultModule()
         {
-            Get["/"] = parameters => View["index.cshtml"];
+            Get["/"] = parameters =>
+            {
+                var model = new DefaultViewModel
+                {
+                    columns = ColumnCollection.GetColumns<IResourceJsonViewModel>(),
+                    resources = new LocalizationResourceService().GetItems().Take(30).ToList().Select(r => new ResourceJsonViewModel(r))
+
+                };
+                return View["index.cshtml", model];
+            };
         }
     }
 }

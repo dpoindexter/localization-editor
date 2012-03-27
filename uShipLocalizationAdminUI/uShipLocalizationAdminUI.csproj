@@ -105,6 +105,13 @@
   <ItemGroup>
     <Compile Include="Data\Contracts\IIndexed.cs" />
     <Compile Include="Data\Contracts\IRepository.cs" />
+    <Compile Include="Models\ColumnCollection.cs" />
+    <Compile Include="Models\Contracts\ColumnModelAttribute.cs" />
+    <Compile Include="Models\Contracts\IResourceJsonViewModel.cs" />
+    <Compile Include="Models\ColumnJsonViewModel.cs" />
+    <Compile Include="Models\Contracts\ModelEnums.cs" />
+    <Compile Include="Models\DefaultViewModel.cs" />
+    <Compile Include="Models\Contracts\IColumnJsonViewModel.cs" />
     <Compile Include="Models\ResourceJsonViewModel.cs" />
     <Compile Include="Services\LocalizationBundleService.cs" />
     <Compile Include="Data\Contracts\ILocalizationContext.cs" />
