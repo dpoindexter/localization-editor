@@ -4,6 +4,8 @@
     margin: 0;
     padding: 0;
     background: url(../img/foil.png) repeat left top;
+    font-size: 75%;
+    font-family: "Verdana";
 }
 
 div#container {
@@ -20,14 +22,112 @@ div#filters {
     
 }
 
-div#resources {
-    
-}
-
 td.limit {
     max-width: 100px;
     max-height: 50px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;       
+}
+
+/*==============================================*/
+
+h4 {
+    background: none repeat scroll 0 0 #666666;
+    border-bottom: 1px solid #DDDDDD;
+    color: #FFFFFF;
+    margin: 0;
+    padding: 7px;
+}
+
+div#resources {
+    position: absolute;
+    top: 58px;
+    overflow: auto;
+    left: 265px;
+    bottom: 35px;
+    right: 35px;
+}
+   
+div#controls {
+    position: absolute;
+    width: 220px;
+    bottom: 35px;
+    top: 58px;
+    left: 35px;
+}
+        
+div#columns {
+    overflow: auto;
+    width: 220px;
+}
+        
+div.column-selector {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #bbb;
+    background-color: #ccc;
+}
+        
+div.column-selector.disabled {
+    background-color: #bbb;
+    border-top: 1px solid #aaa;
+}
+        
+div.column-selector label {
+    color: #333;
+}
+        
+div.column-selector.disabled label {
+    color: #666;   
+}
+        
+table.report {
+    background: none repeat scroll 0 0 white;
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #ddd;
+}
+        
+table.report td {
+    border: 1px solid #DDDDDD;
+    padding: 5px 10px;
+    vertical-align: top;
+}
+        
+table.report th {
+    background: none repeat scroll 0 0 #CCCCCC;
+    font-weight: bold;
+    padding: 5px 10px;
+    vertical-align: top;
+    border-bottom: 1px solid #999;
+    border-top: 1px solid #bbb;
+    border-left: 1px solid #bbb;
+}
+        
+table.report th.sort0, table.report th.sort1 {
+    border-bottom: 2px solid #555;
+}
+        
+table.report tr.pending td {
+    background-color: #cee6f2;
+}
+        
+table.report tr.approved td {
+    background-color: #dff2ce;
+}
+        
+table.report tr.returned td {
+    background-color: #f2edce;
+}
+        
+table.report tr.declined td {
+    background-color: #f2d8ce;
+}
+
+table#attendee-report tr:nth-child(even) td {
+    background-color: #e6eef2;
+}
+
+div#global {
+    margin: 0 35px;
 }

@@ -18,7 +18,7 @@
                 <div id="columns"></div>
             </div>
             <div id="resources">
-                <table id="list-resources">
+                <table id="list-resources" class="report">
                     <thead></thead>
                     <tbody></tbody>
                     <tfoot></tfoot>
@@ -28,7 +28,7 @@
 
         <!-- JS Templates -->
         <script type="text/template" id="listing-header">
-            <th data-id="<%=id%>" class="column-selector<%=(SortDirection) ? ' ' + sort : ''%>">
+            <th data-id="<%=id%>" class="column-selector<%=(IsBeingSortedOn) ? ' sort' + SortDirection : ''%>">
                 <%=ColumnName%>
             </th>
         </script>

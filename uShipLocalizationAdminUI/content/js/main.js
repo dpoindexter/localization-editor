@@ -56,8 +56,8 @@ Editor.Column = Backbone.Model.extend();
 Editor.ColumnGroup = Backbone.Collection.extend({
     model: Editor.Column,
 
-    getEnabledColumnNames: function () {
-        var enabled = this.filter(function (model) { return model.get("Enabled"); });
+    getEnabledAndVisibleColumnNames: function () {
+        var enabled = this.filter(function (model) { return model.get("Enabled") && model.get("Visible"); });
         return _.map(enabled, function (col) { return col.get("ColumnName") });
     }
 });
@@ -73,7 +73,7 @@ Editor.HeaderRow = Backbone.View.extend({
     render: function () {
         var self = this;
         this.collection.each(function (col) {
-            if (col.get("Enabled"))
+            if (col.get("Enabled") && col.get("Visible"))
                 $(self.template(col.toJSON())).appendTo(self.el);
         });
         return this;
@@ -140,7 +140,6 @@ Editor.ResourceRow = Backbone.View.extend({
 
     render: function (cols) {
         $(this.template({ cols: cols, cells: this.model.toJSON() })).appendTo(this.el);
-        //$(this.el).addClass(this.model.get("Status").toLowerCase());
         return this;
     }
 });
@@ -161,7 +160,8 @@ Editor.EditorView = Backbone.View.extend({
         this.resources.bind("change", this.render);
         this.resources.bind("reset", this.render);
         this.columns.bind("change:Enabled", this.render);
-        this.columns.bind("change:Sort", this.sort);
+        this.columns.bind("change:IsBeingSortedOn", this.sort);
+        this.columns.bind("change:SortDirection", this.sort);
 
         this.sort();
     },
@@ -172,22 +172,23 @@ Editor.EditorView = Backbone.View.extend({
 
     changeSort: function (event) {
         var sortColumn = this.columns.get($(event.target).data("id"));
-        var sort = sortColumn.get("SortDirection");
+        var isBeingSortedOn = sortColumn.get("IsBeingSortedOn");
 
-        if (!sort) {
+        if (isBeingSortedOn) { //If the column is already being sorted on, flip the sort direction
+            var sortDirection = (sortColumn.get("SortDirection") === 0) ? 1 : 0;
+            sortColumn.set({ SortDirection: sortDirection });
+        } else { //If it's not being sorted on, unmark the previous sort column and mark the current one, setting the sort order to ascending
             var previousSort = this.columns.find(function (col) {
-                return !_.isNull(col.get("SortDirection"));
+                return col.get("IsBeingSortedOn");
             });
-            previousSort.set({ SortDirection: null }, { silent: true });
-            sortColumn.set({ SortDirection: 0 });
-        } else if (sort === 0) {
-            sortColumn.set({ SortDirection: 1 });
-        } else if (sort === 1) {
-            sortColumn.set({ SortDirection: 0 });
+            previousSort && previousSort.set({ IsBeingSortedOn: false }, { silent: true });
+            sortColumn.set({ SortDirection: 0 }, { silent: true })
+            sortColumn.set({ IsBeingSortedOn: true });
         }
     },
 
     sort: function () {
+        console.log("here");
         var sortColumn = this.columns.find(function (col) {
             return !_.isNull(col.get("SortDirection"));
         });
@@ -201,7 +202,7 @@ Editor.EditorView = Backbone.View.extend({
     render: function () {
         this.appendColumnPickers(this.columns);
         this.appendColumnHeaders(this.columns);
-        this.appendResources(this.resources, this.columns.getEnabledColumnNames());
+        this.appendResources(this.resources, this.columns.getEnabledAndVisibleColumnNames());
     },
 
     appendColumnPickers: function (cols) {
