@@ -9,7 +9,7 @@
     <head>
         <title>Localization Resource Editor</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link href="@Url.Content("~/content/css/main.css")" rel="stylesheet" type="text/css" />
+        <link href="@Url.Content("~/content/css/master.css")" rel="stylesheet" type="text/css" />
     </head>
     <body>
         <div id="container">
@@ -18,47 +18,60 @@
                 <div id="columns"></div>
             </div>
             <div id="resources">
-                <table id="list-resources" class="report">
-                    <thead></thead>
-                    <tbody></tbody>
-                    <tfoot></tfoot>
-                </table>
+                <table id="list-resources" class="report"></table>
             </div>
         </div>
 
         <!-- JS Templates -->
-        <script type="text/template" id="listing-header">
-            <th data-id="<%=id%>" class="column-selector<%=(IsBeingSortedOn) ? ' sort' + SortDirection : ''%>">
-                <%=ColumnName%>
-            </th>
-        </script>
-
-        <script type="text/template" id="resource-row">
-            <% _.each(cols, function(col) { %>
-                 <td class="limit"><%=cells[col]%></td>
-            <%});%>
-        </script>
-
         <script type="text/template" id="column-picker">
-            <div class="column-selector<%=(Enabled) ? '' : ' disabled'%>">
-                <input type="checkbox" id="column-<%=id%>" data-el="<%=id%>" <%=(Enabled) ? 'checked="checked"' : ''%>/>
-                <label for="column-<%=id%>"><%=ColumnName%></label>
-            </div>
+            <% _.each(columns, function(column) { %>
+                <div class="<%= column.enabledCssClass %>">
+                    <input type="checkbox" id="column-<%= column.id %>" data-el="<%= column.id %>" <%= column.checkedHtmlAttribute %>/>
+                    <label for="column-<%= column.id %>"><%= column.ColumnName %></label>
+                </div>
+            <% }); %>
+        </script>
+
+        <script type="text/template" id="resource-table">
+            <thead>
+                <tr>
+                    <% _.each(columns, function(column) { %>
+                        <th data-id="<%= column.id %>" class="<%= column.sortCssClass %>">
+                            <%= column.ColumnName %>
+                        </th>
+                   <% }); %>                 
+                </tr>
+            </thead>
+            <tbody>
+                <% _.each(resources, function(resource) { %>
+                    <tr>
+                        <% _.each(columns, function(column) { %>
+                             <td class="limit"><%= resource[column.ColumnName] %></td>
+                        <%});%>
+                    </tr>
+                <%});%>
+            </tbody>     
         </script>
 
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-        <script type="text/javascript" src="@Url.Content("~/content/js/underscore.js")"></script>
-        <script type="text/javascript" src="@Url.Content("~/content/js/backbone.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/content/js/lib/underscore.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/content/js/lib/backbone.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/content/js/helper/util.js")"></script>
 
         <!-- View Data for JS -->
         <script type="text/javascript">
-            var bootstrap = {
-                columns: @Html.Raw(columnJson),
-                resources: @Html.Raw(resourceJson)
-            }
+            (function () {
+                var Editor = this.Editor = this.Editor || {};
+
+                Editor.bootstrapData = {
+                    columns: @Html.Raw(columnJson),
+                    resources: @Html.Raw(resourceJson)
+                }
+
+            })(this);
         </script>
 
-        <script type="text/javascript" src="@Url.Content("~/content/js/main.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/content/js/app.js")"></script>
     </body>
 </html>
 

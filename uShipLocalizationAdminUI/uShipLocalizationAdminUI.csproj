@@ -86,12 +86,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="content\css\main.css" />
-    <Content Include="content\js\backbone-min.js" />
-    <Content Include="content\js\backbone.js" />
-    <Content Include="content\js\main.js" />
-    <Content Include="content\js\underscore-min.js" />
-    <Content Include="content\js\underscore.js" />
+    <Content Include="content\css\master.css" />
+    <Content Include="content\js\helper\util.js" />
+    <Content Include="content\js\lib\backbone-min.js" />
+    <Content Include="content\js\lib\backbone.js" />
+    <Content Include="content\js\app.js" />
+    <Content Include="content\js\lib\underscore-min.js" />
+    <Content Include="content\js\lib\underscore.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
