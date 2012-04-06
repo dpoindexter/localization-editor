@@ -10,6 +10,8 @@
         resources: Editor.bootstrapData.resources
     };
 
+    Editor.dispatcher = _.clone(Backbone.Events);
+
     //Column model
     Editor.Column = Backbone.Model.extend({
 
@@ -50,6 +52,41 @@
     Editor.ColumnSet = Backbone.Collection.extend({
         model: Editor.Column,
 
+        lastSelected: null,
+
+        toggleEnabled: function (ix, val, silent, suppressLast) {
+           this.at(ix).set({"Enabled": val},{silent: silent});
+           !suppressLast && (this.lastSelected = ix);
+        },
+
+        toggleEnabledRange: function (until, val) {
+            var start = Math.min(this.lastSelected, until);
+            var end = Math.max(this.lastSelected, until);
+            for ( ; start <= end; start++) {
+                this.toggleEnabled(start, val, start != end, start != until);
+            }
+        },
+
+        handleChangeSort: function (ix) {
+            var sortColumn = this.at(ix);
+
+            console.log(ix, this.indexOf(this.get(ix)));
+
+            if (sortColumn.get("IsBeingSortedOn")) { //If the column is already being sorted on, flip the sort direction
+                var sortDirection = (sortColumn.get("SortDirection") === 0) ? 1 : 0;
+                sortColumn.set({ SortDirection: sortDirection });
+            } else { //If it's not being sorted on, unmark the previous sort column and mark the current one, setting the sort order to ascending
+                var previousSort = this.find(function (col) {
+                    return col.get("IsBeingSortedOn");
+                });
+                previousSort && previousSort.set({ IsBeingSortedOn: false }, { silent: true });
+                sortColumn.set({ SortDirection: 0 }, { silent: true });
+                sortColumn.set({ IsBeingSortedOn: true });
+
+                Editor.dispatcher.trigger("comparator:change","foo");
+            }        
+        },
+
         getVisibleColumns: function () {
             return this.filter(function (model) {
                 return model.get("Visible");
@@ -81,23 +118,12 @@
         },
 
         toggle: function (event) {
-            var id = $(event.target).data("el");
-            var col = this.collection.get(id);
+            var ix = $(event.target).data("ix");
+            var val = event.target.checked;
 
-            if (!event.shiftKey || !lastSelected) {
-                lastSelected = col;
-                col.set({ "Enabled": event.target.checked });
-            } else {
-                var self = this;
-                var start = Math.min(lastSelected.id, col.id);
-                var end = Math.max(lastSelected.id, col.id) + 1;
-                _(_.range(start, end)).each(function (id) {
-                    var c = self.collection.get(id);
-                    c.set({ "Enabled": event.target.checked }, { silent: true });
-                });
-                this.collection.trigger("change:Enabled");
-                lastSelected = col;
-            }
+            (event.shiftKey && this.collection.lastSelected)
+                ? this.collection.toggleEnabledRange(ix, val)
+                : this.collection.toggleEnabled(ix, val);
         },
 
         render: function (visibleColumns) {
@@ -114,12 +140,31 @@
         model: Editor.Resource,
         url: "/resources",
 
+        initialize: function () {
+            this.on("comparator:change", function (msg) {
+                console.log("fired");
+            });
+        },
+
+        setComparator: function (columnModel) {
+            var direction = columnModel.get("SortDirection");
+            var type = columnModel.get("SortType") || 0;
+            var sortFunc = Editor.Util.sorting.getSortingFunction(direction, type);
+
+            this.comparator = function (model) {
+                var prm = model.get(columnModel.ColumnName);
+                return sortFunc(prm);
+            };
+        },
+
         getResources: function () {
             return this.map(function (model) {
                 return model.toJSON();
             });
         }
     });
+
+    _.extend(Editor.ResourceCollection, Editor.dispatcher);
 
 
     //Localization Resource view (table row)
@@ -128,7 +173,16 @@
         template: _.template($("#resource-table").html()),
 
         initialize: function () {
-            _.bindAll(this, "render");
+            _.bindAll(this, "render", "changeSort");
+        },
+
+        events: {
+            "click th": "changeSort"
+        },
+
+        changeSort: function (event) {
+            var ix = $(event.target).data("ix");
+            this.options.columns.handleChangeSort(ix);
         },
 
         render: function (enabledVisibleColumns, resources) {
@@ -144,43 +198,24 @@
 
         initialize: function () {
             this.el = viewData.containerEl;
-            _.bindAll(this, "render", "changeSort", "sort");
+            _.bindAll(this, "render");
 
             this.resources = new Editor.ResourceCollection(viewData.resources);
             this.columns = new Editor.ColumnSet(viewData.columns);
             this.columnPicker = new Editor.ColumnPicker({ el: viewData.columnPickerEl, collection: this.columns });
-            this.resourceView = new Editor.ResourceView({ el: viewData.tableEl });
+            this.resourceView = new Editor.ResourceView({ el: viewData.tableEl, columns: this.columns, resources: this.resources });
 
             this.resources.bind("change", this.render);
             this.resources.bind("reset", this.render);
             this.columns.bind("change:Enabled", this.render);
-            this.columns.bind("change:IsBeingSortedOn", this.sort);
-            this.columns.bind("change:SortDirection", this.sort);
+            this.columns.bind("change:IsBeingSortedOn", this.render);
+            //this.columns.bind("change:SortDirection", this.sort);
 
-            this.sort();
+            this.render();
+            //this.sort();
         },
 
-        events: {
-            "click th": "changeSort"
-        },
-
-        changeSort: function (event) {
-            var sortColumn = this.columns.get($(event.target).data("id"));
-            var isBeingSortedOn = sortColumn.get("IsBeingSortedOn");
-
-            if (isBeingSortedOn) { //If the column is already being sorted on, flip the sort direction
-                var sortDirection = (sortColumn.get("SortDirection") === 0) ? 1 : 0;
-                sortColumn.set({ SortDirection: sortDirection });
-            } else { //If it's not being sorted on, unmark the previous sort column and mark the current one, setting the sort order to ascending
-                var previousSort = this.columns.find(function (col) {
-                    return col.get("IsBeingSortedOn");
-                });
-                previousSort && previousSort.set({ IsBeingSortedOn: false }, { silent: true });
-                sortColumn.set({ SortDirection: 0 }, { silent: true })
-                sortColumn.set({ IsBeingSortedOn: true });
-            }
-        },
-
+        /*
         sort: function () {
             var sortColumn = this.columns.find(function (col) {
                 return col.get("IsBeingSortedOn");
@@ -196,6 +231,7 @@
             };
             this.resources.sort();
         },
+        */
 
         render: function () {
             this.columnPicker.render(this.columns.getVisibleColumns());
