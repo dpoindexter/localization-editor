@@ -8,7 +8,19 @@
     font-family: "Verdana";
 }
 
-div#container {
+h4 {
+    background: none repeat scroll 0 0 #666666;
+    color: #eee;
+    margin: 0;
+    padding: 0 7px 7px 7px;
+    text-shadow: 0 1px #000;
+}
+
+#global {
+    margin: 0 35px;
+}
+
+#container {
     position: absolute;
     top: 25px;
     right: 25px;
@@ -18,29 +30,7 @@ div#container {
     border: 1px solid #ccc;
 }
 
-div#filters {
-    
-}
-
-td.limit {
-    max-width: 100px;
-    max-height: 50px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;       
-}
-
-/*==============================================*/
-
-h4 {
-    background: none repeat scroll 0 0 #666666;
-    border-bottom: 1px solid #DDDDDD;
-    color: #FFFFFF;
-    margin: 0;
-    padding: 7px;
-}
-
-div#resources {
+#resources {
     position: absolute;
     top: 58px;
     overflow: auto;
@@ -49,52 +39,69 @@ div#resources {
     right: 35px;
 }
    
-div#controls {
+#controls {
     position: absolute;
-    width: 220px;
+    width: 190px;
     bottom: 35px;
     top: 58px;
     left: 35px;
+    background: #666;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
 }
         
-div#columns {
+#columns {
     overflow: auto;
-    width: 220px;
+    width: 190px;
+    border: 1px solid #444;
 }
         
-div.column-selector {
+.column-selector {
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #bbb;
     background-color: #ccc;
+    padding: 6px 0;
+    background-image: url(../img/eye.png);
+    background-repeat: no-repeat;
+    background-position: 5px center;
+}
+
+.column-selector input {
+    display: none;
 }
         
-div.column-selector.disabled {
+.column-selector.disabled {
     background-color: #bbb;
     border-top: 1px solid #aaa;
+    background-image: url(../img/eye-disabled.png);
 }
         
-div.column-selector label {
+.column-selector label {
     color: #333;
+    padding-left: 30px;
+    text-shadow: #ddd 0px 1px 0px;
 }
         
-div.column-selector.disabled label {
-    color: #666;   
+.column-selector.disabled label {
+    color: #666;
+    text-shadow: none;  
 }
         
-table.report {
+.report {
     background: none repeat scroll 0 0 white;
     border-collapse: collapse;
     width: 100%;
     border: 1px solid #ddd;
 }
         
-table.report td {
+td {
     border: 1px solid #DDDDDD;
     padding: 5px 10px;
     vertical-align: top;
 }
         
-table.report th {
+th {
     background: none repeat scroll 0 0 #CCCCCC;
     font-weight: bold;
     padding: 5px 10px;
@@ -104,30 +111,26 @@ table.report th {
     border-left: 1px solid #bbb;
 }
         
-table.report th.sort0, table.report th.sort1 {
+.sort0, .sort1 {
     border-bottom: 2px solid #555;
 }
-        
-table.report tr.pending td {
-    background-color: #cee6f2;
-}
-        
-table.report tr.approved td {
-    background-color: #dff2ce;
-}
-        
-table.report tr.returned td {
-    background-color: #f2edce;
-}
-        
-table.report tr.declined td {
-    background-color: #f2d8ce;
-}
 
-table#attendee-report tr:nth-child(even) td {
+.report tr:nth-child(even) td {
     background-color: #e6eef2;
 }
 
-div#global {
-    margin: 0 35px;
+.limit {
+    max-width: 100px;
+    max-height: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#magnifier {
+    background: #666;
+    padding: 25px;
+    color: white;
+    display: none;
+    position: absolute;
 }

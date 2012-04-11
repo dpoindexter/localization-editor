@@ -17,16 +17,16 @@
 
         sortCssClass: function () {
             var direction = this.get("SortDirection");
-            var suffix = this.get("IsBeingSortedOn") 
-                ? " sort" + direction 
+            var suffix = this.get("IsBeingSortedOn")
+                ? " sort" + direction
                 : "";
 
-            return "column-selector" + suffix;
+            return "column-header" + suffix;
         },
 
         enabledCssClass: function () {
-            var suffix = this.get("Enabled") 
-                ? "" 
+            var suffix = this.get("Enabled")
+                ? ""
                 : " disabled";
 
             return "column-selector" + suffix;
@@ -55,36 +55,33 @@
         lastSelected: null,
 
         toggleEnabled: function (ix, val, silent, suppressLast) {
-           this.at(ix).set({"Enabled": val},{silent: silent});
-           !suppressLast && (this.lastSelected = ix);
+            this.at(ix).set({ "Enabled": val }, { silent: silent });
+            !suppressLast && (this.lastSelected = ix);
         },
 
         toggleEnabledRange: function (until, val) {
             var start = Math.min(this.lastSelected, until);
             var end = Math.max(this.lastSelected, until);
-            for ( ; start <= end; start++) {
+            for (; start <= end; start++) {
                 this.toggleEnabled(start, val, start != end, start != until);
             }
         },
 
-        handleChangeSort: function (ix) {
-            var sortColumn = this.at(ix);
+        setSortColumn: function (ix) {
+            var columnModel = this.at(ix);
 
-            console.log(ix, this.indexOf(this.get(ix)));
+            if (!columnModel) return;
 
-            if (sortColumn.get("IsBeingSortedOn")) { //If the column is already being sorted on, flip the sort direction
-                var sortDirection = (sortColumn.get("SortDirection") === 0) ? 1 : 0;
-                sortColumn.set({ SortDirection: sortDirection });
-            } else { //If it's not being sorted on, unmark the previous sort column and mark the current one, setting the sort order to ascending
-                var previousSort = this.find(function (col) {
-                    return col.get("IsBeingSortedOn");
-                });
-                previousSort && previousSort.set({ IsBeingSortedOn: false }, { silent: true });
-                sortColumn.set({ SortDirection: 0 }, { silent: true });
-                sortColumn.set({ IsBeingSortedOn: true });
+            if (columnModel.IsBeingSortedOn) {
+                sortDirection = columnModel.get("SortDirection");
+                columnModel.set({ "SortDirection": (sortDirection) ? 0 : 1 });
+            } else {
+                console.log(this);
+                this.where({ IsBeingSortedOn: true })[0].set({ "IsBeingSortedOn": false });
+                columnModel.set({ "SortDirection": 0, "IsBeingSortedOn": true });
+            }
 
-                Editor.dispatcher.trigger("comparator:change","foo");
-            }        
+            return columnModel;
         },
 
         getVisibleColumns: function () {
@@ -96,8 +93,8 @@
         },
 
         getEnabledAndVisibleColumns: function () {
-            return this.filter(function (model) { 
-                return model.get("Enabled") && model.get("Visible"); 
+            return this.filter(function (model) {
+                return model.get("Enabled") && model.get("Visible");
             }).map(function (model) {
                 return model.toViewModel();
             });
@@ -133,21 +130,17 @@
     });
 
     //Localization Resource model
-    Editor.Resource = Backbone.Model.extend({});
+    Editor.Resource = Backbone.Model.extend();
 
     //Localization Resource model collection
     Editor.ResourceCollection = Backbone.Collection.extend({
         model: Editor.Resource,
         url: "/resources",
 
-        initialize: function () {
-            this.on("comparator:change", function (msg) {
-                console.log("fired");
-            });
-        },
-
         setComparator: function (columnModel) {
-            var direction = columnModel.get("SortDirection");
+            if (!columnModel) return;
+
+            var direction = columnModel.get("SortDirection") || 0;
             var type = columnModel.get("SortType") || 0;
             var sortFunc = Editor.Util.sorting.getSortingFunction(direction, type);
 
@@ -155,6 +148,10 @@
                 var prm = model.get(columnModel.ColumnName);
                 return sortFunc(prm);
             };
+
+            console.log(this.comparator);
+
+            this.sort();
         },
 
         getResources: function () {
@@ -164,25 +161,31 @@
         }
     });
 
-    _.extend(Editor.ResourceCollection, Editor.dispatcher);
-
-
     //Localization Resource view (table row)
     Editor.ResourceView = Backbone.View.extend({
 
         template: _.template($("#resource-table").html()),
 
         initialize: function () {
-            _.bindAll(this, "render", "changeSort");
+            _.bindAll(this, "render", "handleChangeSort");
         },
 
         events: {
-            "click th": "changeSort"
+            "click th": "handleChangeSort",
+            "click td.limit": "magnify"
         },
 
-        changeSort: function (event) {
+        handleChangeSort: function (event) {
             var ix = $(event.target).data("ix");
-            this.options.columns.handleChangeSort(ix);
+            Editor.dispatcher.trigger("change:sort", ix);
+        },
+
+        magnify: function (event) {
+            var target = $(event.target);
+            var offset = target.offset();
+            Editor.magnifier()
+                .css({ 'display': 'block', 'top': offset.top, 'left': offset.left })
+                .html(target.html());
         },
 
         render: function (enabledVisibleColumns, resources) {
@@ -191,7 +194,14 @@
         }
     });
 
-
+    Editor.magnifier = _.once( function () {
+            var el = $("<div></div>").attr({ id: 'magnifier' });
+            el.on('click', function (event) {
+                $(event.target).css({ 'display': 'none' });
+            });
+            el.appendTo($('body'));
+            return el;
+        });
 
     //Top-level editor view -- responsible for sub-views
     Editor.EditorView = Backbone.View.extend({
@@ -203,40 +213,25 @@
             this.resources = new Editor.ResourceCollection(viewData.resources);
             this.columns = new Editor.ColumnSet(viewData.columns);
             this.columnPicker = new Editor.ColumnPicker({ el: viewData.columnPickerEl, collection: this.columns });
-            this.resourceView = new Editor.ResourceView({ el: viewData.tableEl, columns: this.columns, resources: this.resources });
+            this.resourceView = new Editor.ResourceView({ el: viewData.tableEl, collection: this.resources, columns: this.columns });
 
             this.resources.bind("change", this.render);
             this.resources.bind("reset", this.render);
             this.columns.bind("change:Enabled", this.render);
-            this.columns.bind("change:IsBeingSortedOn", this.render);
-            //this.columns.bind("change:SortDirection", this.sort);
+
+            Editor.dispatcher.on("change:sort", function (ix) {
+                var columnModel = this.columns.setSortColumn(ix);
+                this.resources.setComparator(columnModel);
+                this.render();
+            }, this);
 
             this.render();
-            //this.sort();
         },
-
-        /*
-        sort: function () {
-            var sortColumn = this.columns.find(function (col) {
-                return col.get("IsBeingSortedOn");
-            });
-
-            this.resources.comparator = function (req) {
-                var column = req.get(sortColumn.get("ColumnName"));
-                var direction = sortColumn.get("SortDirection");
-                var type = sortColumn.get("SortType") || 0;
-                var sortFunc = Editor.Util.sorting.getSortingFunction(direction, type);
-
-                return sortFunc(column);
-            };
-            this.resources.sort();
-        },
-        */
 
         render: function () {
             this.columnPicker.render(this.columns.getVisibleColumns());
             this.resourceView.render(this.columns.getEnabledAndVisibleColumns(), this.resources.getResources());
-        },
+        }
     });
 
 }).call(this);
