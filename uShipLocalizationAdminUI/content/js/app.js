@@ -3,9 +3,10 @@
     var Editor = this.Editor = this.Editor || {};
 
     var viewData = {
-        containerEl: $("#container"),
-        tableEl: $("#list-resources"),
-        columnPickerEl: $("#columns"),
+        containerEl: $('#container'),
+        tableEl: $('#list-resources'),
+        columnPickerEl: $('#columns'),
+        magnifierEl: $('#magnifier'),
         columns: Editor.bootstrapData.columns,
         resources: Editor.bootstrapData.resources
     };
@@ -16,24 +17,24 @@
     Editor.Column = Backbone.Model.extend({
 
         sortCssClass: function () {
-            var direction = this.get("SortDirection");
-            var suffix = this.get("IsBeingSortedOn")
-                ? " sort" + direction
-                : "";
+            var direction = this.get('SortDirection');
+            var suffix = this.get('IsBeingSortedOn')
+                ? ' sort' + direction
+                : '';
 
-            return "column-header" + suffix;
+            return 'column-header' + suffix;
         },
 
         enabledCssClass: function () {
-            var suffix = this.get("Enabled")
-                ? ""
-                : " disabled";
+            var suffix = this.get('Enabled')
+                ? ''
+                : ' disabled';
 
-            return "column-selector" + suffix;
+            return 'column-selector' + suffix;
         },
 
         checkedHtmlAttribute: function () {
-            return this.get("Enabled")
+            return this.get('Enabled')
                 ? 'checked="checked"'
                 : '';
         },
@@ -55,15 +56,17 @@
         lastSelected: null,
 
         toggleEnabled: function (ix, val, silent, suppressLast) {
-            this.at(ix).set({ "Enabled": val }, { silent: silent });
+            var val = (typeof val !== 'undefined') ? val: !this.at(ix).get("Enabled");
+            this.at(ix).set({ 'Enabled': val }, { silent: silent });
             !suppressLast && (this.lastSelected = ix);
         },
 
-        toggleEnabledRange: function (until, val) {
+        toggleEnabledRange: function (until) {
+            var val = !this.at(until).get("Enabled");
             var start = Math.min(this.lastSelected, until);
             var end = Math.max(this.lastSelected, until);
             for (; start <= end; start++) {
-                this.toggleEnabled(start, val, start != end, start != until);
+                this.toggleEnabled(start, val, start !== end, start !== until);
             }
         },
 
@@ -73,12 +76,12 @@
             if (!columnModel) return;
 
             if (columnModel.IsBeingSortedOn) {
-                sortDirection = columnModel.get("SortDirection");
-                columnModel.set({ "SortDirection": (sortDirection) ? 0 : 1 });
+                sortDirection = columnModel.get('SortDirection');
+                columnModel.set({ 'SortDirection': (sortDirection) ? 0 : 1 });
             } else {
                 console.log(this);
-                this.where({ IsBeingSortedOn: true })[0].set({ "IsBeingSortedOn": false });
-                columnModel.set({ "SortDirection": 0, "IsBeingSortedOn": true });
+                this.where({ IsBeingSortedOn: true })[0].set({ 'IsBeingSortedOn': false });
+                columnModel.set({ 'SortDirection': 0, 'IsBeingSortedOn': true });
             }
 
             return columnModel;
@@ -86,7 +89,7 @@
 
         getVisibleColumns: function () {
             return this.filter(function (model) {
-                return model.get("Visible");
+                return model.get('Visible');
             }).map(function (model) {
                 return model.toViewModel();
             });
@@ -94,7 +97,7 @@
 
         getEnabledAndVisibleColumns: function () {
             return this.filter(function (model) {
-                return model.get("Enabled") && model.get("Visible");
+                return model.get('Enabled') && model.get('Visible');
             }).map(function (model) {
                 return model.toViewModel();
             });
@@ -104,23 +107,22 @@
     //Column picker control view
     Editor.ColumnPicker = Backbone.View.extend({
 
-        template: _.template($("#column-picker").html()),
+        template: _.template($('#column-picker').html()),
 
         initialize: function () {
-            _.bindAll(this, "render", "toggle");
+            _.bindAll(this, 'render', 'toggle');
         },
 
         events: {
-            "click input:checkbox": "toggle"
+            'click label': 'toggle'
         },
 
         toggle: function (event) {
-            var ix = $(event.target).data("ix");
-            var val = event.target.checked;
+            var ix = $(event.target).data('ix');
 
             (event.shiftKey && this.collection.lastSelected)
-                ? this.collection.toggleEnabledRange(ix, val)
-                : this.collection.toggleEnabled(ix, val);
+                ? this.collection.toggleEnabledRange(ix)
+                : this.collection.toggleEnabled(ix);
         },
 
         render: function (visibleColumns) {
@@ -135,13 +137,13 @@
     //Localization Resource model collection
     Editor.ResourceCollection = Backbone.Collection.extend({
         model: Editor.Resource,
-        url: "/resources",
+        url: '/resources',
 
         setComparator: function (columnModel) {
             if (!columnModel) return;
 
-            var direction = columnModel.get("SortDirection") || 0;
-            var type = columnModel.get("SortType") || 0;
+            var direction = columnModel.get('SortDirection') || 0;
+            var type = columnModel.get('SortType') || 0;
             var sortFunc = Editor.Util.sorting.getSortingFunction(direction, type);
 
             this.comparator = function (model) {
@@ -164,28 +166,28 @@
     //Localization Resource view (table row)
     Editor.ResourceView = Backbone.View.extend({
 
-        template: _.template($("#resource-table").html()),
+        template: _.template($('#resource-table').html()),
+
+        magnifierIsOn: null,
 
         initialize: function () {
-            _.bindAll(this, "render", "handleChangeSort");
+            _.bindAll(this, 'render', 'handleChangeSort');
         },
 
         events: {
-            "click th": "handleChangeSort",
-            "click td.limit": "magnify"
+            'click th': 'handleChangeSort',
+            'click td': 'magnify'
         },
 
         handleChangeSort: function (event) {
-            var ix = $(event.target).data("ix");
-            Editor.dispatcher.trigger("change:sort", ix);
+            var ix = $(event.target).data('ix');
+            Editor.dispatcher.trigger('change:sort', ix);
         },
 
         magnify: function (event) {
             var target = $(event.target);
-            var offset = target.offset();
-            Editor.magnifier()
-                .css({ 'display': 'block', 'top': offset.top, 'left': offset.left })
-                .html(target.html());
+            if (!target.parents('#magnifier').length)
+                Editor.dispatcher.trigger('click:magnify', target);
         },
 
         render: function (enabledVisibleColumns, resources) {
@@ -194,32 +196,50 @@
         }
     });
 
-    Editor.magnifier = _.once( function () {
-            var el = $("<div></div>").attr({ id: 'magnifier' });
-            el.on('click', function (event) {
-                $(event.target).css({ 'display': 'none' });
-            });
-            el.appendTo($('body'));
-            return el;
-        });
+    Editor.Magnifier = Backbone.View.extend({
+
+        currentEl: null,
+
+        initialize: function () {
+
+            Editor.dispatcher.on('click:magnify', function (target) {
+                this.toggleMagnifier(target);
+            }, this)
+
+        },
+
+        toggleMagnifier: function (target) {
+            if (this.el === target[0] || this.currentEl === target[0]) {
+                this.$el.hide();
+                this.currentEl = null;
+            } else {
+                this.$el.find('textarea').val(target.html());
+                this.$el.appendTo(target).show();
+                this.currentEl = target[0];
+            }
+        }
+
+    });
 
     //Top-level editor view -- responsible for sub-views
     Editor.EditorView = Backbone.View.extend({
 
         initialize: function () {
             this.el = viewData.containerEl;
-            _.bindAll(this, "render");
+            _.bindAll(this, 'render');
 
             this.resources = new Editor.ResourceCollection(viewData.resources);
             this.columns = new Editor.ColumnSet(viewData.columns);
+
             this.columnPicker = new Editor.ColumnPicker({ el: viewData.columnPickerEl, collection: this.columns });
             this.resourceView = new Editor.ResourceView({ el: viewData.tableEl, collection: this.resources, columns: this.columns });
+            this.magnifier = new Editor.Magnifier({ el: viewData.magnifierEl });
 
-            this.resources.bind("change", this.render);
-            this.resources.bind("reset", this.render);
-            this.columns.bind("change:Enabled", this.render);
+            this.resources.bind('change', this.render);
+            this.resources.bind('reset', this.render);
+            this.columns.bind('change:Enabled', this.render);
 
-            Editor.dispatcher.on("change:sort", function (ix) {
+            Editor.dispatcher.on('change:sort', function (ix) {
                 var columnModel = this.columns.setSortColumn(ix);
                 this.resources.setComparator(columnModel);
                 this.render();

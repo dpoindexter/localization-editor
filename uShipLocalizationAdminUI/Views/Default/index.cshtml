@@ -21,14 +21,15 @@
                 <table id="list-resources" class="report"></table>
             </div>
         </div>
-
+        <div id="magnifier">
+            <textarea name="magnifier-text"></textarea>
+        </div>
         <!-- JS Templates -->
         <script type="text/template" id="column-picker">
             <% _.each(columns, function(column) { %>
-                <div class="<%= column.enabledCssClass %>">
-                    <input type="checkbox" id="column-<%= column.id %>" data-ix="<%= column.id %>" <%= column.checkedHtmlAttribute %>/>
-                    <label for="column-<%= column.id %>"><%= column.ColumnName %></label>
-                </div>
+                <label class="<%= column.enabledCssClass %>" data-ix="<%= column.id %>">
+                    <%= column.ColumnName %>
+                </label>
             <% }); %>
         </script>
 
@@ -53,7 +54,7 @@
             </tbody>     
         </script>
 
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
         <script type="text/javascript" src="@Url.Content("~/content/js/lib/underscore.js")"></script>
         <script type="text/javascript" src="@Url.Content("~/content/js/lib/backbone.js")"></script>
         <script type="text/javascript" src="@Url.Content("~/content/js/helper/util.js")"></script>
