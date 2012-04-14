@@ -12,6 +12,7 @@ namespace uShipLocalizationAdminUI.Contracts.Models
         public bool Visible { get; set; }
         public bool Enabled { get; set; }
         public bool IsBeingSortedOn { get; set; }
+        public bool IsKeyColumn { get; set; }
         public SortDirections SortDirection{ get; set; }
         public SortTypes SortType { get; set; }
 
@@ -20,6 +21,7 @@ namespace uShipLocalizationAdminUI.Contracts.Models
             Visible = true;
             Enabled = true;
             IsBeingSortedOn = false;
+            IsKeyColumn = false;
             SortDirection = SortDirections.Ascending;
             SortType = SortTypes.String;
         }

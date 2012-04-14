@@ -125,6 +125,10 @@ th {
     background-color: #e6eef2;
 }
 
+.report .key-column {
+    font-weight: bold;
+}
+
 .limit {
     max-width: 100px;
     max-height: 50px;
@@ -139,13 +143,12 @@ th {
     display: none;
     position: absolute;
     z-index: 1;
-    width: 300px;
-    height: 100px;
-    margin-left: -150px;
+    width: 224px;
+    height: 90px;
 }
 
 #magnifier textarea {
-    font: bold 12px/16px Verdana;
+    font: bold 12px/16px georgia;
     display: block;
-    width: auto;
+    width: 218px;
 }

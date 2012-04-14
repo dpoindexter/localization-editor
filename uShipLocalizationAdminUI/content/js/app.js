@@ -33,6 +33,12 @@
             return 'column-selector' + suffix;
         },
 
+        keyCssClass: function () {
+            return this.get('IsKeyColumn')
+                ? 'key-column'
+                : 'limit';
+        },
+
         checkedHtmlAttribute: function () {
             return this.get('Enabled')
                 ? 'checked="checked"'
@@ -43,6 +49,7 @@
             return _.extend(this.toJSON(), {
                 sortCssClass: this.sortCssClass(),
                 enabledCssClass: this.enabledCssClass(),
+                keyCssClass: this.keyCssClass(),
                 checkedHtmlAttribute: this.checkedHtmlAttribute()
             });
         }
@@ -156,6 +163,15 @@
             this.sort();
         },
 
+        getMagnifierData: function (id, column) {
+            var model = this.get(id);
+            return {
+                key: model.get("ResourceKey"),
+                lang: column,
+                html: model.get(column)
+            };
+        },
+
         getResources: function () {
             return this.map(function (model) {
                 return model.toJSON();
@@ -186,8 +202,9 @@
 
         magnify: function (event) {
             var target = $(event.target);
+            var magnifierData = this.collection.getMagnifierData(target.data('id'), target.data('column'));
             if (!target.parents('#magnifier').length)
-                Editor.dispatcher.trigger('click:magnify', target);
+                Editor.dispatcher.trigger('click:magnify', {target: target, data: magnifierData});
         },
 
         render: function (enabledVisibleColumns, resources) {
@@ -199,6 +216,7 @@
     Editor.Magnifier = Backbone.View.extend({
 
         currentEl: null,
+        textField: null,
 
         initialize: function () {
 
@@ -206,16 +224,26 @@
                 this.toggleMagnifier(target);
             }, this)
 
+            this.textField = this.$el.find('textarea');
+
         },
 
-        toggleMagnifier: function (target) {
-            if (this.el === target[0] || this.currentEl === target[0]) {
+        toggleMagnifier: function (params) {
+            if (this.el === params.target[0] || this.currentEl === params.target[0]) {
                 this.$el.hide();
                 this.currentEl = null;
             } else {
-                this.$el.find('textarea').val(target.html());
-                this.$el.appendTo(target).show();
-                this.currentEl = target[0];
+                this.textField.val(params.data.html);
+                this.$el.appendTo(params.target)
+                    .show()
+                    .position({
+                        of: params.target,
+                        my: 'center top',
+                        at: 'center top',
+                        offset: '0 -20',
+                        collision: 'flip'
+                    });
+                this.currentEl = params.target[0];
             }
         }
 

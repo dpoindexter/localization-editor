@@ -26,6 +26,7 @@ namespace uShipLocalizationAdminUI.Models
                         Enabled = columnModelAttribute.Enabled,
                         Visible = columnModelAttribute.Visible,
                         IsBeingSortedOn = columnModelAttribute.IsBeingSortedOn,
+                        IsKeyColumn = columnModelAttribute.IsKeyColumn,
                         SortDirection = columnModelAttribute.SortDirection,
                         SortType = columnModelAttribute.SortType
                     });

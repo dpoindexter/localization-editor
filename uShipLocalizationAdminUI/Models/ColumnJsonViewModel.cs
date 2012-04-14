@@ -14,6 +14,7 @@ namespace uShipLocalizationAdminUI.Models
         public bool Enabled { get; set; }
         public bool Visible { get; set; }
         public bool IsBeingSortedOn { get; set; }
+        public bool IsKeyColumn { get; set; }
         public SortDirections SortDirection { get; set; }
         public SortTypes SortType { get; set; }
     }

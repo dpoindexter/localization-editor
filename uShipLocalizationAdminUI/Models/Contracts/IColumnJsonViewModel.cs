@@ -7,6 +7,7 @@ namespace uShipLocalizationAdminUI.Contracts.Models
         bool Enabled { get; set; }
         bool Visible { get; set; }
         bool IsBeingSortedOn { get; set; }
+        bool IsKeyColumn { get; set; }
         SortDirections SortDirection { get; set; }
         SortTypes SortType { get; set; }
     }

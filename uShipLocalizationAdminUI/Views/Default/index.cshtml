@@ -47,7 +47,7 @@
                 <% _.each(resources, function(resource) { %>
                     <tr>
                         <% _.each(columns, function(column) { %>
-                             <td class="limit"><%= resource[column.ColumnName] %></td>
+                             <td class="<%= column.keyCssClass %>" data-id="<%= resource.id %>" data-column="<%= column.ColumnName %>"><%= resource[column.ColumnName] %></td>
                         <%});%>
                     </tr>
                 <%});%>
@@ -55,6 +55,7 @@
         </script>
 
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+        <script type="text/javascript" src="@Url.Content("~/content/js/lib/jquery-ui-1.8.18.position.min.js")"></script>
         <script type="text/javascript" src="@Url.Content("~/content/js/lib/underscore.js")"></script>
         <script type="text/javascript" src="@Url.Content("~/content/js/lib/backbone.js")"></script>
         <script type="text/javascript" src="@Url.Content("~/content/js/helper/util.js")"></script>
