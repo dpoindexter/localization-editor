@@ -5,7 +5,8 @@
     var viewData = {
         containerEl: $('#container'),
         tableEl: $('#list-resources'),
-        columnPickerEl: $('#columns'),
+        columnPickerEl: $('#column-picker'),
+        findResourcesEl: $('#menu'),
         magnifierEl: $('#magnifier'),
         columns: Editor.bootstrapData.columns,
         resources: Editor.bootstrapData.resources
@@ -114,10 +115,12 @@
     //Column picker control view
     Editor.ColumnPicker = Backbone.View.extend({
 
-        template: _.template($('#column-picker').html()),
+        template: _.template($('#column-picker-template').html()),
 
         initialize: function () {
             _.bindAll(this, 'render', 'toggle');
+            this.container = this.$el.find('#columns');
+            this.$el.hide();
         },
 
         events: {
@@ -133,7 +136,7 @@
         },
 
         render: function (visibleColumns) {
-            this.$el.html(this.template({ columns: visibleColumns }));
+            this.container.html(this.template({ columns: visibleColumns }));
             return this;
         }
     });
@@ -249,6 +252,24 @@
 
     });
 
+    Editor.FindResourcesView = Backbone.View.extend({
+
+        initialize: function () {
+            _.bindAll(this, 'toggleColumnPicker');
+
+            this.columnPicker = this.options.controls.columnPicker;
+        },
+
+        events: {
+            'click #toggle-column-picker': 'toggleColumnPicker'
+        },
+
+        toggleColumnPicker: function (event) {
+            this.columnPicker.$el.toggle();
+        }
+
+    });
+
     //Top-level editor view -- responsible for sub-views
     Editor.EditorView = Backbone.View.extend({
 
@@ -261,6 +282,7 @@
 
             this.columnPicker = new Editor.ColumnPicker({ el: viewData.columnPickerEl, collection: this.columns });
             this.resourceView = new Editor.ResourceView({ el: viewData.tableEl, collection: this.resources, columns: this.columns });
+            this.finderView = new Editor.FindResourcesView({ el: viewData.findResourcesEl, controls: { columnPicker: this.columnPicker } });
             this.magnifier = new Editor.Magnifier({ el: viewData.magnifierEl });
 
             this.resources.bind('change', this.render);

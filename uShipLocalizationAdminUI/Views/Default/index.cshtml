@@ -12,11 +12,14 @@
         <link href="@Url.Content("~/content/css/master.css")" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        <div id="container">
-            <div id="controls">
+        <div id="menu">
+            <a id="toggle-column-picker">Visible Columns...</a>
+            <div id="column-picker">
                 <h4>Visible Columns</h4>
                 <div id="columns"></div>
             </div>
+        </div>
+        <div id="container">
             <div id="resources">
                 <table id="list-resources" class="report"></table>
             </div>
@@ -25,7 +28,7 @@
             <textarea name="magnifier-text"></textarea>
         </div>
         <!-- JS Templates -->
-        <script type="text/template" id="column-picker">
+        <script type="text/template" id="column-picker-template">
             <% _.each(columns, function(column) { %>
                 <label class="<%= column.enabledCssClass %>" data-ix="<%= column.id %>">
                     <%= column.ColumnName %>
